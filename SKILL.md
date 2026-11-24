@@ -54,11 +54,17 @@ Follow `references/figma_export.md`. Per application:
 
 ## Step 4. Bleed
 
-A Figma frame is usually the trim size, so there is no artwork in the bleed area.
+A Figma frame is usually the trim size (for example exactly A5), so nothing runs into the bleed. A PDF made from it shows white or empty edges after trimming. Making only the frame bigger does not fix this: the shapes that touch the edge must also run on into the bleed.
 
-- Frame background is one solid colour: pass it with `--bg "#RRGGBB"`. The build places a rectangle in that colour under the artwork, covering the full bleed.
-- Frame has an image, gradient or pattern that runs to the edge: tell the user the bleed will be empty (white) and offer two fixes: enlarge the frame in a Figma copy by the bleed (3 mm = 8.5 px at 1 px = 1 pt) and export again with `--src-has-bleed`, or accept white bleed for now.
-- Frame already contains the bleed (it is trim size + 2 x bleed): pass `--src-has-bleed`. Width and height stay the trim size.
+Check every direct child of the frame: does it touch or cross the frame edge?
+
+- **Nothing but the background touches the edge, and the background is one solid colour:** pass it with `--bg "#RRGGBB"`. The build places a rectangle in that colour under the artwork, covering the full bleed.
+- **Shapes, patterns, images or gradients touch the edge (default fix):** make a bleed clone in Figma with the snippet "Bleed clone" in `references/figma_export.md`. It copies the frame, makes it bigger by the bleed on every side (3 mm per side, so 6 mm extra in total: A5 148 x 210 mm becomes 154 x 216 mm), keeps the design centred, and lets every element that touches the edge run on to the new edge. Text and logos away from the edge stay as they are. Take a screenshot of the clone, check it, tell the user which layers were extended, export the clone with `--src-has-bleed`, then delete the clone.
+- **Frame already contains the bleed** (trim size + 2 x bleed on each axis): pass `--src-has-bleed`. Width and height stay the trim size.
+
+Bleed in Figma pixels depends on the frame scale: `bleed_px = bleed_mm * frame_width_px / trim_width_mm`. At 1 px = 1 pt, 3 mm is 8.5 px. A frame drawn at 300 ppi needs 35.4 px.
+
+When the user made the frame bigger by hand, check it: the bigger frame must be trim + 2 x bleed (not trim + bleed), and the artwork must reach the new edges.
 
 ## Step 5. Build and export
 
